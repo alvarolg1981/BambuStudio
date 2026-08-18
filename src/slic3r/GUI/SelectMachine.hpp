@@ -1,6 +1,7 @@
 #ifndef slic3r_GUI_SelectMachine_hpp_
 #define slic3r_GUI_SelectMachine_hpp_
 
+#include <memory>
 #include <wx/wx.h>
 #include <wx/intl.h>
 #include <wx/collpane.h>
@@ -335,6 +336,16 @@ private:
     std::list<PrintOption*>                  m_checkbox_list_order;
 
     std::shared_ptr<int>                m_token = std::make_shared<int>(0);
+
+    /* BMCU: reenvio automatico depois do erro 050x-409D */
+    bool                                m_is_auto_retry_0500_409d_invoke{ false };
+    bool                                m_auto_retry_0500_409d_pending{ false };
+    bool                                m_auto_retry_0500_409d_exhausted{ false };
+    int                                 m_auto_retry_0500_409d_attempts{ 0 };
+    int                                 m_auto_retry_0500_409d_ready_checks{ 0 };
+    int                                 m_auto_retry_0500_409d_wait_left{ 0 };
+    std::string                         m_auto_retry_0500_409d_dev_id;
+    std::unique_ptr<wxTimer>            m_auto_retry_0500_409d_timer{ nullptr };
     std::vector<wxString>               m_bedtype_list;
     std::vector<MachineObject*>         m_list;
     std::vector<FilamentInfo>           m_filaments;
@@ -522,6 +533,11 @@ public:
     void show_errors(wxString& info);
     void on_ok_btn(wxCommandEvent& event);
     void on_reselect_dialog_btn_clicked(wxMouseEvent&);
+
+    void schedule_auto_retry_0500_409d(const std::string& dev_id);
+    void on_auto_retry_0500_409d_timer(wxTimerEvent& event);
+    bool is_auto_retry_0500_409d_ready();
+    void stop_auto_retry_0500_409d(bool clear_guard);
     void Enable_Auto_Refill(bool enable);
     void on_send_print();
     void clear_ip_address_config(wxCommandEvent& e);

@@ -39,6 +39,7 @@
 
 #include <mutex>
 #include <stack>
+#include <chrono>
 
 #ifdef __APPLE__
 #include <IOKit/pwr_mgt/IOPMLib.h>
@@ -341,6 +342,11 @@ private:
     Slic3r::TaskManager* m_task_manager { nullptr };
     NetworkAgent* m_agent { nullptr };
 
+    /* BMCU: janela em que suprimimos re-conexao/dialogos enquanto limpamos o 050x-409D */
+    std::mutex       m_bmcu_auto_retry_mutex;
+    std::string      m_bmcu_auto_retry_dev_id;
+    std::chrono::steady_clock::time_point m_bmcu_auto_retry_until{};
+
     wgtFilaManagerStore*            m_fila_manager_store        { nullptr };
     wgtFilaManagerSync*             m_fila_manager_sync         { nullptr };
     wgtFilaManagerCloudClient*      m_fila_manager_cloud_client { nullptr };
@@ -534,6 +540,10 @@ public:
     void            request_user_login(int online_login = 0);
     void            request_user_handle(int online_login = 0);
     void            request_user_logout();
+
+    void            begin_bmcu_auto_retry(const std::string& dev_id, int timeout_ms = 25000);
+    void            finish_bmcu_auto_retry(const std::string& dev_id = std::string());
+    bool            is_bmcu_auto_retry_active(const std::string& dev_id = std::string());
     int             request_user_unbind(std::string dev_id);
     std::string     handle_web_request(std::string cmd);
     void            handle_script_message(std::string msg);
