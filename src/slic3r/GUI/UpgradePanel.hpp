@@ -47,6 +47,13 @@ public:
     wxStaticBitmap *m_ams_new_version_img;
     ScalableBitmap upgrade_green_icon;
 
+    /* BMCU: link e status de firmware, so aparecem quando o SN comeca com 0EA */
+    wxStaticText* m_fw_link_lbl   = nullptr;
+    wxStaticText* m_fw_link       = nullptr;
+    wxString      m_fw_url;
+    wxStaticText* m_fw_status_lbl = nullptr;
+    wxStaticText* m_fw_status     = nullptr;
+
     AmsPanel(wxWindow *      parent,
                      wxWindowID      id    = wxID_ANY,
                      const wxPoint & pos   = wxDefaultPosition,
