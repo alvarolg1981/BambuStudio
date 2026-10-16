@@ -4226,6 +4226,10 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
             if (boost::starts_with(m_curr_characters, "BambuStudio-")) {
                 m_is_bbl_3mf = true;
                 m_bambuslicer_generator_version = Semver::parse(m_curr_characters.substr(12));
+            } else if (boost::starts_with(m_curr_characters, "BambuStudioBMCU-")) {
+                // BMCU: 3mf salvos pela 02.08.02.61 com o SLIC3R_APP_KEY proprio
+                m_is_bbl_3mf = true;
+                m_bambuslicer_generator_version = Semver::parse(m_curr_characters.substr(16));
             }
         //TODO: currently use version 0, no need to load&&save this string
         /*} else if (m_curr_metadata_name == BBS_FDM_SUPPORTS_PAINTING_VERSION) {
@@ -7259,7 +7263,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
                 date = date.substr(0, 10);
                 metadata_item_map[BBL_CREATION_DATE_TAG] = date;
                 metadata_item_map[BBL_MODIFICATION_TAG]  = date;
-                metadata_item_map[BBL_APPLICATION_TAG]   = (boost::format("%1%-%2%") % SLIC3R_APP_KEY % SLIC3R_VERSION).str();
+                metadata_item_map[BBL_APPLICATION_TAG]   = (boost::format("BambuStudio-%1%") % SLIC3R_VERSION).str();
             }
             metadata_item_map[BBS_3MF_VERSION] = std::to_string(VERSION_BBS_3MF);
 
