@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cctype>
 #include <condition_variable>
+#include <iostream>
 #include <mutex>
 #include "libslic3r/MTUtils.hpp"
 #include "libslic3r/Model.hpp"
@@ -869,6 +870,8 @@ void PrintJob::process()
         }
 
         BOOST_LOG_TRIVIAL(error) << "print_job: failed, result = " << result;
+        std::cerr << "BMCU: print_job failed result=" << result
+                  << " msg=" << msg_text.utf8_string() << std::endl;
     } else {
         // wait for printer mqtt ready the same job id
 
