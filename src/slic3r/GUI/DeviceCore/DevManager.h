@@ -29,6 +29,10 @@ private:
     std::map<std::string, MachineObject*> localMachineList;     /* dev_id -> MachineObject*, localMachine SSDP   */
     std::map<std::string, MachineObject*> userMachineList;      /* dev_id -> MachineObject*  cloudMachine of User */
 
+    /* BMCU: callback que a UI registra para reenviar o print apos o 050x-409D */
+    std::mutex autoRetryPrintUiCallbackMutex;
+    std::function<bool(const std::string&)> m_auto_retry_print_ui_callback;
+
 public:
     DeviceManager(NetworkAgent* agent = nullptr);
     ~DeviceManager();
@@ -40,6 +44,9 @@ public:
     void start_refresher();
     void stop_refresher();
 
+
+    void set_auto_retry_print_ui_callback(std::function<bool(const std::string&)> callback);
+    bool trigger_auto_retry_print_ui_callback(const std::string& dev_id);
     MachineObject* get_selected_machine();
     bool set_selected_machine(std::string dev_id);
     void load_last_machine();

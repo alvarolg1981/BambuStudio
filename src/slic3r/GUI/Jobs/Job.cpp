@@ -4,6 +4,7 @@
 #include "Job.hpp"
 #include <libslic3r/Thread.hpp>
 #include "libslic3r/Log.hpp"
+#include <wx/thread.h>
 
 namespace Slic3r {
 
@@ -37,7 +38,16 @@ void GUI::Job::update_percent_finish()
 
 void GUI::Job::show_error_info(wxString msg, int code, wxString description, wxString extra)
 {
-    m_progress->show_error_info(msg, code, description, extra);
+    // BMCU: a barra de status mexe na janela, e o macOS 27 mata o app se isso
+    // sair da thread do job. Mesma fila do update_status, entao a ordem se mantem.
+    if (wxIsMainThread()) {
+        m_progress->show_error_info(msg, code, description, extra);
+        return;
+    }
+    auto progress = m_progress;
+    CallAfter([progress, msg, code, description, extra]() {
+        progress->show_error_info(msg, code, description, extra);
+    });
 }
 
 GUI::Job::Job(std::shared_ptr<ProgressIndicator> pri)
